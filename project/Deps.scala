@@ -21,7 +21,7 @@ object Deps {
   def argonautShapeless = "com.github.alexarchambault" %% "argonaut-shapeless_6.2" % "1.2.0-M6"
 
   def sbtPgp = Def.setting {
-    val sbtv = CrossVersion.binarySbtVersion(sbtVersion.value)
+    val sbtv = CrossVersion.binarySbtVersion(sbtVersion.in(pluginCrossBuild).value)
     val sv = scalaBinaryVersion.value
     val ver = "1.1.0"
     sbtPluginExtra("com.jsuereth" % "sbt-pgp" % ver, sbtv, sv)

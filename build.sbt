@@ -6,6 +6,7 @@ import Publish._
 parallelExecution.in(Global) := false
 
 lazy val core = crossProject
+  .disablePlugins(ScriptedPlugin)
   .jvmConfigure(_.enablePlugins(ShadingPlugin))
   .jvmSettings(
     shading,
@@ -40,6 +41,7 @@ lazy val coreJvm = core.jvm
 lazy val coreJs = core.js
 
 lazy val `fetch-js` = project
+  .disablePlugins(ScriptedPlugin)
   .enablePlugins(ScalaJSPlugin)
   .dependsOn(coreJs)
   .settings(
@@ -49,6 +51,7 @@ lazy val `fetch-js` = project
   )
 
 lazy val tests = crossProject
+  .disablePlugins(ScriptedPlugin)
   .dependsOn(core)
   .jvmConfigure(_.dependsOn(cache % "test"))
   .jsConfigure(_.dependsOn(`fetch-js` % "test"))
@@ -70,6 +73,7 @@ lazy val testsJvm = tests.jvm
 lazy val testsJs = tests.js
 
 lazy val `proxy-tests` = project
+  .disablePlugins(ScriptedPlugin)
   .dependsOn(testsJvm % "test->test")
   .configs(Integration)
   .settings(
@@ -83,6 +87,7 @@ lazy val `proxy-tests` = project
   )
 
 lazy val paths = project
+  .disablePlugins(ScriptedPlugin)
   .settings(
     pureJava,
     dontPublish,
@@ -90,6 +95,7 @@ lazy val paths = project
   )
 
 lazy val cache = project
+  .disablePlugins(ScriptedPlugin)
   .dependsOn(coreJvm)
   .settings(
     shared,
@@ -101,6 +107,7 @@ lazy val cache = project
   )
 
 lazy val bootstrap = project
+  .disablePlugins(ScriptedPlugin)
   .settings(
     pureJava,
     dontPublish,
@@ -111,6 +118,7 @@ lazy val bootstrap = project
   )
 
 lazy val extra = project
+  .disablePlugins(ScriptedPlugin)
   .enablePlugins(ShadingPlugin)
   .dependsOn(coreJvm)
   .settings(
@@ -144,6 +152,7 @@ lazy val extra = project
 
 lazy val cli = project
   .dependsOn(coreJvm, cache, extra)
+  .disablePlugins(ScriptedPlugin)
   .enablePlugins(PackPlugin, SbtProguard)
   .settings(
     shared,
@@ -163,6 +172,7 @@ lazy val cli = project
   )
 
 lazy val web = project
+  .disablePlugins(ScriptedPlugin)
   .enablePlugins(ScalaJSPlugin)
   .dependsOn(coreJs, `fetch-js`)
   .settings(
@@ -209,6 +219,7 @@ lazy val web = project
 
 lazy val doc = project
   .dependsOn(coreJvm, cache)
+  .disablePlugins(ScriptedPlugin)
   .enablePlugins(TutPlugin)
   .settings(
     shared,
@@ -219,6 +230,7 @@ lazy val doc = project
 
 lazy val `sbt-coursier` = project
   .dependsOn(coreJvm, cache, extra)
+  .enablePlugins(ScriptedPlugin)
   .settings(
     plugin,
     utest
@@ -226,6 +238,7 @@ lazy val `sbt-coursier` = project
 
 lazy val `sbt-pgp-coursier` = project
   .dependsOn(`sbt-coursier`)
+  .enablePlugins(ScriptedPlugin)
   .settings(
     plugin,
     libs ++= {
@@ -238,7 +251,7 @@ lazy val `sbt-pgp-coursier` = project
   )
 
 lazy val `sbt-shading` = project
-  .enablePlugins(ShadingPlugin)
+  .enablePlugins(ScriptedPlugin, ShadingPlugin)
   .dependsOn(`sbt-coursier`)
   .settings(
     plugin,
@@ -251,6 +264,7 @@ lazy val `sbt-shading` = project
 
 lazy val `sbt-launcher` = project
   .enablePlugins(PackPlugin)
+  .disablePlugins(ScriptedPlugin)
   .dependsOn(cache)
   .settings(
     shared,
@@ -269,6 +283,7 @@ lazy val `sbt-launcher` = project
 
 lazy val `http-server` = project
   .enablePlugins(PackPlugin)
+  .disablePlugins(ScriptedPlugin)
   .settings(
     shared,
     dontPublishIn("2.10", "2.11"),
@@ -287,6 +302,7 @@ lazy val `http-server` = project
 
 lazy val okhttp = project
   .dependsOn(cache)
+  .disablePlugins(ScriptedPlugin)
   .settings(
     shared,
     coursierPrefix,
@@ -295,9 +311,11 @@ lazy val okhttp = project
 
 lazy val echo = project
   .settings(pureJava)
+  .disablePlugins(ScriptedPlugin)
 
 lazy val jvm = project
   .dummy
+  .disablePlugins(ScriptedPlugin)
   .aggregate(
     coreJvm,
     testsJvm,
@@ -324,6 +342,7 @@ lazy val jvm = project
 
 lazy val js = project
   .dummy
+  .disablePlugins(ScriptedPlugin)
   .aggregate(
     coreJs,
     `fetch-js`,
@@ -339,6 +358,7 @@ lazy val js = project
 // run sbt-plugins/publishLocal to publish all that necessary for plugins
 lazy val `sbt-plugins` = project
   .dummy
+  .disablePlugins(ScriptedPlugin)
   .aggregate(
     coreJvm,
     cache,
@@ -354,6 +374,7 @@ lazy val `sbt-plugins` = project
 
 lazy val coursier = project
   .in(root)
+  .disablePlugins(ScriptedPlugin)
   .aggregate(
     coreJvm,
     coreJs,
