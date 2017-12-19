@@ -10,6 +10,7 @@ object MavenTests extends TestSuite {
   // only tested on the JVM for lack of support of XML attributes in the platform-dependent XML stubs
 
   val tests = TestSuite {
+
     'testSnapshotNoVersioning - {
 
       val dep = Dependency(
@@ -52,7 +53,7 @@ object MavenTests extends TestSuite {
       }
     }
 
-    'testSnapshotWithTimestampsNoVesioning - {
+    'testSnapshotWithTimestampsNoVesioningFirstPom - {
       val dep = Dependency(
         Module("com.abc", "test-snapshot-special"),
         "0.0.0-SNAPSHOT",
@@ -64,7 +65,48 @@ object MavenTests extends TestSuite {
       val repo = MavenRepository(repoBase)
 
       val mainJarUrl = repoBase + "com/abc/test-snapshot-special/0.0.0-SNAPSHOT/test-snapshot-special-0.0.0-20170422.034426-83.jar"
-      val pomUrl = repoBase + "com/abc/test-snapshot-special/0.0.0-SNAPSHOT/test-snapshot-special-0.0.0-20170421.034426-82.par"
+      val pomUrl = repoBase + "com/abc/test-snapshot-special/0.0.0-SNAPSHOT/test-snapshot-special-0.0.0-20170421.034426-82.pom"
+
+      * - CentralTests.withArtifacts(
+        dep = dep,
+        artifactType = "jar",
+        extraRepos = Seq(repo),
+        classifierOpt = None,
+        optional = true
+      ) {
+        case Seq(artifact) =>
+          assert(artifact.url == mainJarUrl)
+        case other =>
+          throw new Exception(s"Unexpected number of artifacts\n${other.mkString("\n")}")
+      }
+
+      * - CentralTests.withArtifacts(
+        dep = dep,
+        artifactType = "pom",
+        extraRepos = Seq(repo),
+        optional = true,
+        classifierOpt = None
+      ) {
+        case Seq(artifact) =>
+          assert(artifact.url == pomUrl)
+        case other =>
+          throw new Exception(s"Unexpected number of artifacts\n${other.mkString("\n")}")
+      }
+    }
+
+    'testSnapshotWithTimestampsNoVesioningFirstJar - {
+      val dep = Dependency(
+        Module("com.abc", "test-snapshot-special"),
+        "0.2.0-SNAPSHOT",
+        transitive = false,
+        attributes = Attributes()
+      )
+
+      val repoBase = getClass.getResource("/test-repo/http/abc.com").toString.stripSuffix("/") + "/"
+      val repo = MavenRepository(repoBase)
+
+      val mainJarUrl = repoBase + "com/abc/test-snapshot-special/0.2.0-SNAPSHOT/test-snapshot-special-0.2.0-20170421.034426-82.jar"
+      val pomUrl = repoBase + "com/abc/test-snapshot-special/0.2.0-SNAPSHOT/test-snapshot-special-0.2.0-20170422.034426-83.pom"
 
       * - CentralTests.withArtifacts(
         dep = dep,
